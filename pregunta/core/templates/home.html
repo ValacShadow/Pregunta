@@ -1,0 +1,19 @@
+<h1>Welcome to Pregunta</h1>
+
+{% if request.user.is_authenticated %}
+  <p>Hello, {{ request.user.username }} | <a href="{% url 'logout' %}">Logout</a></p>
+{% else %}
+  <p><a href="{% url 'register' %}">Create Account</a> | <a href="{% url 'login' %}">Login</a></p>
+{% endif %}
+
+<h2>Top 10 Most Liked Questions</h2>
+<ul>
+  {% for question in questions %}
+    <li>
+      <a href="{% url 'question_detail' question.pk %}">{{ question.title }}</a> - 
+      Likes: {{ question.total_likes }}
+    </li>
+  {% empty %}
+    <li>No questions yet.</li>
+  {% endfor %}
+</ul>

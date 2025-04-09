@@ -1,0 +1,13 @@
+<h2>{{ question.title }}</h2>
+<p>{{ question.body }}</p>
+<a href="{% url 'answer_question' question.pk %}">Answer</a>
+<hr>
+<h3>Answers</h3>
+{% for answer in answers %}
+  <p>{{ answer.body }}</p>
+  <form method="post" action="{% url 'like_answer' answer.pk %}">
+    {% csrf_token %}
+    <button type="submit">Like ({{ answer.like_set.count }})</button>
+  </form>
+  <hr>
+{% endfor %}
