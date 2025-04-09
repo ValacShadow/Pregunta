@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Prefetch
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -14,6 +14,16 @@ def home(request):
         Question.objects
         .annotate(total_likes=Count('answer__like'))
         .select_related('user')
+        .prefetch_related(
+            Prefetch(
+                'answer_set',
+                queryset=Answer.objects
+                    .annotate(num_likes=Count('like'))
+                    .select_related('user')
+                    .order_by('-num_likes', '-created_at')[:3],
+                to_attr='top_answers'
+            )
+        )
         .order_by('-total_likes')[:10]
     )
     return render(request, 'home.html', {'questions': top_questions})
@@ -40,16 +50,49 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('home')
+
+@login_required
+def my_account(request):
+    return render(request, 'my_account.html', {'user': request.user})
 
 @login_required
 def question_list(request):
     questions = (
         Question.objects
-        .select_related('user')  # Fetch user for each question
+        .select_related('user')
+        .prefetch_related(
+            Prefetch(
+                'answer_set',
+                queryset=Answer.objects
+                    .annotate(num_likes=Count('like'))
+                    .select_related('user')
+                    .order_by('-num_likes', '-created_at')[:3],
+                to_attr='top_answers'
+            )
+        )
         .order_by('-created_at')
     )
-    return render(request, 'question_list.html', {'questions': questions})
+    return render(request, 'question_list.html', {'questions': questions, 'tab': 'all'})
+
+def my_questions(request):
+    questions = (
+        Question.objects
+        .filter(user=request.user)
+        .select_related('user')
+        .prefetch_related(
+            Prefetch(
+                'answer_set',
+                queryset=Answer.objects
+                    .annotate(num_likes=Count('like'))
+                    .select_related('user')
+                    .order_by('-num_likes', '-created_at')[:3],
+                to_attr='top_answers'
+            )
+        )
+        .order_by('-created_at')
+    )
+    return render(request, 'question_list.html', {'questions': questions, 'tab': 'my'})
 
 @login_required
 def ask_question(request):

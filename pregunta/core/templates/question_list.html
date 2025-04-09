@@ -1,8 +1,38 @@
-<h2>Questions</h2>
-<a href="{% url 'ask_question' %}">Ask a Question</a> |
-<a href="{% url 'logout' %}">Logout</a>
-<ul>
+{% extends 'base.html' %}
+{% block title %}Questions{% endblock %}
+
+{% block content %}
+  <h2>Questions</h2>
+
+  <div class="auth-links">
+    <a href="{% url 'ask_question' %}">Ask a Question</a> |
+    <a href="{% url 'question_list' %}" {% if tab == 'all' %}style="font-weight:bold"{% endif %}>Feed</a> |
+    <a href="{% url 'my_questions' %}" {% if tab == 'my' %}style="font-weight:bold"{% endif %}>My Questions</a> |
+    <a href="{% url 'my_account' %}">My Account</a> |
+    <a href="{% url 'logout' %}">Logout</a>
+  </div>
+
   {% for question in questions %}
-    <li><a href="{% url 'question_detail' question.pk %}">{{ question.title }}</a></li>
+    <div class="question-card">
+      <h3><a href="{% url 'question_detail' question.pk %}">{{ question.title }}</a></h3>
+      <p>{{ question.body }}</p>
+      <p class="likes">Asked by: {{ question.user.username }}</p>
+
+      {% if question.top_answers %}
+        <h4>Top Answers:</h4>
+        <ul class="top-answers">
+          {% for answer in question.top_answers %}
+            <li>
+              <p>{{ answer.body }}</p>
+              <p class="likes">Likes: {{ answer.num_likes }} | Answered by: {{ answer.user.username }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No answers yet.</p>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>No questions found.</p>
   {% endfor %}
-</ul>
+{% endblock %}
