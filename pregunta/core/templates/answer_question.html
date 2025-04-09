@@ -1,5 +1,16 @@
-<h2>Answer Question: {{ question.title }}</h2>
-<form method="post">{% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Submit</button>
-</form>
+{% extends 'base.html' %}
+{% block title %}Answer: {{ question.title }}{% endblock %}
+
+{% block content %}
+<div class="form-container">
+  <h2>Answer Question</h2>
+  <p><strong>{{ question.title }}</strong></p>
+  <p>{{ question.body }}</p>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+  </form>
+</div>
+{% endblock %}

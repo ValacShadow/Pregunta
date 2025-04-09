@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/feed/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "core/static"]
 
 
 # Application definition
