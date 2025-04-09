@@ -1,0 +1,8 @@
+<h2>Questions</h2>
+<a href="{% url 'ask_question' %}">Ask a Question</a> |
+<a href="{% url 'logout' %}">Logout</a>
+<ul>
+  {% for question in questions %}
+    <li><a href="{% url 'question_detail' question.pk %}">{{ question.title }}</a></li>
+  {% endfor %}
+</ul>
